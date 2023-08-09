@@ -1,5 +1,6 @@
 import * as Option from "@effect/data/Option";
 import * as Effect from "@effect/io/Effect";
+import c from "tinyrainbow";
 
 import type { Preset } from "../types";
 import { Collect } from "./collect";
@@ -21,7 +22,9 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 		const elements = yield* _(collector.collect());
 
 		yield* _(
-			Effect.forEach(elements, (el) => {
+			elements,
+			Effect.forEach((el) => {
+				// eslint-disable-next-line array-callback-return
 				return Effect.gen(function* gen(_) {
 					if (!(el instanceof HTMLElement)) {
 						return;
@@ -37,7 +40,7 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 						if (contentText.includes(snippet)) {
 							blockedEls.add(el);
 							yield* _(disposer.dispose(el));
-							yield* _(Effect.log(`Blocked by snippet: ${snippet}`));
+							yield* _(Effect.log(`Blocked by snippet: ${c.gray(c.strikethrough(snippet))}`));
 							return;
 						}
 					}
@@ -54,7 +57,7 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 						if (exp.test(contentText)) {
 							blockedEls.add(el);
 							yield* _(disposer.dispose(el));
-							yield* _(Effect.log(`Blocked by regexp: ${regexp}`));
+							yield* _(Effect.log(`Blocked by regexp: ${c.gray(regexp)}`));
 							return;
 						}
 					}
@@ -67,7 +70,7 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 						if (Option.isSome(matched)) {
 							blockedEls.add(el);
 							yield* _(disposer.dispose(el));
-							yield* _(Effect.log(`Blocked by keyword: ${matched.value}`));
+							yield* _(Effect.log(`Blocked by keyword: ${c.gray(c.strikethrough(matched.value))}`));
 							return;
 						}
 					}
