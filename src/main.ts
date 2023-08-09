@@ -19,9 +19,6 @@ const debouncedRunKeywordFilter = debounce(100, () => Effect.runFork(keywordFilt
 });
 
 function observer(container = document.body) {
-	window.addEventListener("hashchange", debouncedRunKeywordFilter);
-	window.addEventListener("focus", debouncedRunKeywordFilter);
-
 	const mutationObserver = new MutationObserver((mutations) => {
 		const childListChanged = mutations.some((mutation) => mutation.type === "childList");
 
@@ -39,19 +36,14 @@ function observer(container = document.body) {
 
 	return Effect.sync(() => {
 		mutationObserver.disconnect();
-		window.removeEventListener("focus", debouncedRunKeywordFilter);
-		window.removeEventListener("hashchange", debouncedRunKeywordFilter);
 	});
 }
 
-function main() {
-	F.pipe(
-		Effect.promise(() => elementReady("body")),
-		Effect.flatMap(() => Effect.sync(observer)),
-		Effect.tap(() => Effect.log("BiliBili Filter is running...")),
-		Effect.catchAll((e) => Effect.sync(() => console.error(e))),
-		Effect.runPromise,
-	);
-}
+const program = F.pipe(
+	Effect.promise(() => elementReady("body")),
+	Effect.flatMap(() => Effect.sync(observer)),
+	Effect.flatMap(() => Effect.sync(() => window.addEventListener("focus", debouncedRunKeywordFilter))),
+	Effect.flatMap(() => Effect.log("BiliBili Filter is running...")),
+);
 
-main();
+Effect.runPromise(program);
