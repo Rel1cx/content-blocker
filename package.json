@@ -1,5 +1,5 @@
 {
-	"name": "bilibili-filter",
+	"name": "content-blocker",
 	"type": "module",
 	"version": "0.0.1",
 	"private": true,
@@ -15,7 +15,7 @@
 	"browserslist": "defaults",
 	"devDependencies": {
 		"@total-typescript/ts-reset": "0.4.2",
-		"@types/node": "20.4.8",
+		"@types/node": "20.4.9",
 		"@types/throttle-debounce": "5.0.0",
 		"core-dts": "0.0.3",
 		"eslint": "8.46.0",

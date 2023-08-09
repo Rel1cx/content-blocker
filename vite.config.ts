@@ -9,9 +9,9 @@ export default defineConfig({
 		monkey({
 			entry: "src/main.ts",
 			userscript: {
-				name: "bilibili-filter",
-				namespace: "me.relicx.bilibili-filter",
-				description: "BiliBili 过滤器",
+				name: "content-blocker",
+				namespace: "me.relicx.content-blocker",
+				description: "Universal content blocker",
 				author: "Rel1cx",
 				match: ["https://*.bilibili.com/*"],
 				"run-at": "document-body",

@@ -1,3 +1,8 @@
-# bilibili-filter
+# content-blocker
 
-A tampermonkey script to filter out videos you don't like on bilibili.com
+The universal content blocker.
+
+## Supported websites
+
+-   [BiliBili](https://www.bilibili.com/)
+-   ...

@@ -1,49 +1,49 @@
-import "./styles.css";
 import "@total-typescript/ts-reset";
+import "./styles/base.css";
 
 import * as F from "@effect/data/Function";
 import * as Effect from "@effect/io/Effect";
 import elementReady from "element-ready";
 import { debounce } from "throttle-debounce";
 
-import { KEYWORD_FILTER_SELECTORS, NORMALIZED_KEYWORDS } from "./constants";
-import { make } from "./filters/keyword-filter";
-import { BlockServiceLive } from "./services/block-service";
+import { NORMALIZED_KEYWORDS } from "./constants";
+import { make } from "./core/blocker";
+import { Collect } from "./core/collect";
+import { Disposal } from "./core/disposal";
+import { Extract } from "./core/extract";
+import * as bilibili from "./impl/bilibili.com";
 
-const keywordFilterProgram = make(KEYWORD_FILTER_SELECTORS.join(", "), NORMALIZED_KEYWORDS);
+const blocker = make(["en", "zh-CN"], NORMALIZED_KEYWORDS);
 
-const keywordFilterRunnable = F.pipe(keywordFilterProgram, Effect.provideLayer(BlockServiceLive));
+const BiliBiliBlockRunnable = F.pipe(
+	blocker,
+	Effect.provideService(Collect, bilibili.collect),
+	Effect.provideService(Extract, bilibili.extract),
+	Effect.provideService(Disposal, bilibili.disposal),
+);
 
-const debouncedRunKeywordFilter = debounce(100, () => Effect.runFork(keywordFilterRunnable), {
+const debouncedRunKeywordFilter = debounce(100, () => Effect.runSync(BiliBiliBlockRunnable), {
 	atBegin: true,
 });
 
 function observer(container = document.body) {
-	const mutationObserver = new MutationObserver((mutations) => {
-		const childListChanged = mutations.some((mutation) => mutation.type === "childList");
-
-		if (!childListChanged) {
-			return;
-		}
-
-		debouncedRunKeywordFilter();
-	});
-
-	mutationObserver.observe(container, {
-		childList: true,
-		subtree: true,
-	});
-
 	return Effect.sync(() => {
-		mutationObserver.disconnect();
+		const mutationObserver = new MutationObserver(debouncedRunKeywordFilter);
+
+		mutationObserver.observe(container, {
+			childList: true,
+			subtree: true,
+		});
+
+		Effect.addFinalizer(() => Effect.sync(() => mutationObserver.disconnect()));
 	});
 }
 
 const program = F.pipe(
 	Effect.promise(() => elementReady("body")),
-	Effect.flatMap(() => Effect.sync(observer)),
+	Effect.flatMap(observer),
 	Effect.flatMap(() => Effect.sync(() => window.addEventListener("focus", debouncedRunKeywordFilter))),
-	Effect.flatMap(() => Effect.log("BiliBili Filter is running...")),
+	Effect.flatMap(() => Effect.log("Content Filter is running...")),
 );
 
 Effect.runPromise(program);
