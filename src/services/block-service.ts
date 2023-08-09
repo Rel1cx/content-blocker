@@ -2,14 +2,14 @@ import * as Context from "@effect/data/Context";
 import * as Effect from "@effect/io/Effect";
 import * as Layer from "@effect/io/Layer";
 
-export type BlockerService = {
+export type BlockService = {
 	readonly block: (el: HTMLElement) => Effect.Effect<never, never, void>;
 	readonly unBlock: (el: HTMLElement) => Effect.Effect<never, never, void>;
 };
 
-export const BlockerService = Context.Tag<BlockerService>();
+export const BlockerService = Context.Tag<BlockService>();
 
-export const BlockerServiceLive = Layer.succeed(
+export const BlockServiceLive = Layer.succeed(
 	BlockerService,
 	BlockerService.of({
 		block(el) {

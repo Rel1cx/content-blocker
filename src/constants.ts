@@ -1,8 +1,8 @@
 // import { keyword } from "../block-list.example.json";
-import { keyword } from "../block-list.json";
-import { stringNormalize } from "./lib/string-normalize";
+import { keyword } from "../block-list.example.json";
+import { textContentNormalize } from "./lib/text-content-normalize";
 
-export const NORMALIZED_KEYWORDS = keyword.map(stringNormalize).map((word) => word.toLowerCase().trim());
+export const NORMALIZED_KEYWORDS = keyword.map(textContentNormalize);
 
 export const KEYWORD_FILTER_SELECTORS = [
 	// Main site

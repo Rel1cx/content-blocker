@@ -8,17 +8,20 @@ import { debounce } from "throttle-debounce";
 
 import { KEYWORD_FILTER_SELECTORS, NORMALIZED_KEYWORDS } from "./constants";
 import { make } from "./filters/keyword-filter";
-import { BlockerServiceLive } from "./services/block-service";
+import { BlockServiceLive } from "./services/block-service";
 
 const keywordFilterProgram = make(KEYWORD_FILTER_SELECTORS.join(", "), NORMALIZED_KEYWORDS);
 
-const keywordFilterRunnable = F.pipe(keywordFilterProgram, Effect.provideLayer(BlockerServiceLive));
+const keywordFilterRunnable = F.pipe(keywordFilterProgram, Effect.provideLayer(BlockServiceLive));
 
 const debouncedRunKeywordFilter = debounce(100, () => Effect.runFork(keywordFilterRunnable), {
 	atBegin: true,
 });
 
 function observer(container = document.body) {
+	window.addEventListener("hashchange", debouncedRunKeywordFilter);
+	window.addEventListener("focus", debouncedRunKeywordFilter);
+
 	const mutationObserver = new MutationObserver((mutations) => {
 		const childListChanged = mutations.some((mutation) => mutation.type === "childList");
 
@@ -36,6 +39,8 @@ function observer(container = document.body) {
 
 	return Effect.sync(() => {
 		mutationObserver.disconnect();
+		window.removeEventListener("focus", debouncedRunKeywordFilter);
+		window.removeEventListener("hashchange", debouncedRunKeywordFilter);
 	});
 }
 
