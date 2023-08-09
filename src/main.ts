@@ -6,14 +6,14 @@ import * as Effect from "@effect/io/Effect";
 import elementReady from "element-ready";
 import { debounce } from "throttle-debounce";
 
-import { NORMALIZED_KEYWORDS } from "./constants";
 import { make } from "./core/blocker";
 import { Collect } from "./core/collect";
 import { Disposal } from "./core/disposal";
 import { Extract } from "./core/extract";
 import * as bilibili from "./impl/bilibili.com";
+import * as preset from "./presets/test.json";
 
-const blocker = make(["en", "zh-CN"], NORMALIZED_KEYWORDS);
+const blocker = make(preset);
 
 const BiliBiliBlockRunnable = F.pipe(
 	blocker,

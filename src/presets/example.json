@@ -1,0 +1,7 @@
+{
+	"version": 1,
+	"locales": ["en", "zh-CN"],
+	"keywords": ["测试"],
+	"snippets": ["测试片段"],
+	"regexps": ["^测试正则"]
+}

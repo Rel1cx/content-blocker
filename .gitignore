@@ -23,7 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-/block-list.json
 /stats.html
 
 DESIGN.md

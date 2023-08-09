@@ -18,6 +18,7 @@ module.exports = {
 		"@typescript-eslint/no-floating-promises": "off",
 		"@typescript-eslint/no-confusing-void-expression": "off",
 		"@typescript-eslint/explicit-module-boundary-types": "off",
+		"unicorn/no-array-method-this-argument": "off",
 		"security/detect-object-injection": "off",
 	},
 	overrides: [
