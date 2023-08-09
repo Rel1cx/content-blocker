@@ -15,15 +15,11 @@ export const BlockServiceLive = Layer.succeed(
 		block(el) {
 			return Effect.sync(() => {
 				el.setAttribute("data-blocked", "true");
-				el.setAttribute("data-blocked-type", "keyword");
-				// el.setAttribute("data-blocked-reason", words.join(String.fromCodePoint(0x200b)));
 			});
 		},
 		unBlock(el) {
 			return Effect.sync(() => {
 				el.removeAttribute("data-blocked");
-				el.removeAttribute("data-blocked-type");
-				// el.removeAttribute("data-blocked-reason");
 			});
 		},
 	}),

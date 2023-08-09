@@ -11,7 +11,7 @@ export default defineConfig({
 			userscript: {
 				name: "bilibili-filter",
 				namespace: "me.relicx.bilibili-filter",
-				description: "bilibili 过滤器",
+				description: "BiliBili 过滤器",
 				author: "Rel1cx",
 				match: ["https://*.bilibili.com/*"],
 				"run-at": "document-body",

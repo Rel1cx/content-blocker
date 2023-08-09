@@ -1,3 +1,3 @@
-# tampermonkey-vite-template
+# bilibili-filter
 
-A template for creating a Tampermonkey script using Vite and TypeScript.
+A tampermonkey script to filter out videos you don't like on bilibili.com
