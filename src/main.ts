@@ -6,10 +6,10 @@ import * as Effect from "@effect/io/Effect";
 import elementReady from "element-ready";
 import { debounce } from "throttle-debounce";
 
-import { make } from "./core/blocker";
 import { Collect } from "./core/collect";
 import { Disposal } from "./core/disposal";
 import { Extract } from "./core/extract";
+import { make } from "./core/mod";
 import * as bilibili from "./impl/bilibili.com";
 import * as preset from "./presets/test.json";
 

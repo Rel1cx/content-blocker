@@ -1,3 +1,4 @@
+import * as Option from "@effect/data/Option";
 import * as Effect from "@effect/io/Effect";
 
 import type { Preset } from "../types";
@@ -61,10 +62,12 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 					const segmentIter = yield* _(segmenter.segment(contentText));
 
 					for (const { segment } of segmentIter) {
-						if (keywords.some((keyword) => segment.includes(keyword))) {
+						const matched = Option.fromNullable(keywords.find((keyword) => segment.includes(keyword)));
+
+						if (Option.isSome(matched)) {
 							blockedEls.add(el);
 							yield* _(disposer.dispose(el));
-							yield* _(Effect.log(`Blocked by keyword: ${segment}`));
+							yield* _(Effect.log(`Blocked by keyword: ${matched.value}`));
 							return;
 						}
 					}
