@@ -1,4 +1,4 @@
-import * as Effect from "@effect/io/Effect";
+import { Effect } from "effect";
 
 // eslint-disable-next-line filenames-simple/named-export
 export function make(locales: string | string[] = ["en", "zh-CN"]) {

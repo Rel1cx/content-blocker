@@ -1,5 +1,5 @@
-import * as Context from "@effect/data/Context";
-import type * as Effect from "@effect/io/Effect";
+import type { Effect } from "effect";
+import { Context } from "effect";
 
 export type Disposal = {
 	readonly dispose: (el: HTMLElement) => Effect.Effect<never, never, void>;

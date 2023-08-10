@@ -1,3 +1,8 @@
-export class InvalidRegExpError {
-	readonly _tag = "InvalidRegExpError";
-}
+import { Data } from "effect";
+
+export type InvalidRegExpError = Data.Case & {
+	readonly _tag: "InvalidRegExpError";
+	readonly message: string;
+};
+
+export const InvalidRegExpError = Data.tagged<InvalidRegExpError>("InvalidRegExpError");

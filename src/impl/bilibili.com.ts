@@ -1,5 +1,6 @@
-import * as Effect from "@effect/io/Effect";
+import { Effect } from "effect";
 
+import { DATA_CONTENT_BLOCKER_BLOCKED } from "../constants";
 import { Collect } from "../core/collect";
 import { Disposal } from "../core/disposal";
 import { Extract } from "../core/extract";
@@ -29,6 +30,8 @@ const selectors = [
 
 export const collect = Collect.of({
 	collect: () => Effect.succeed(document.querySelectorAll(selectors.join(", "))),
+	collectBlocked: () => Effect.succeed(document.querySelectorAll(`[${DATA_CONTENT_BLOCKER_BLOCKED}="true"]`)),
+	isBlocked: (el) => Effect.succeed(el.getAttribute(DATA_CONTENT_BLOCKER_BLOCKED) === "true"),
 });
 
 export const extract = Extract.of({
@@ -44,14 +47,14 @@ export const extract = Extract.of({
 export const disposal = Disposal.of({
 	dispose: (el) => {
 		return Effect.sync(() => {
-			el.setAttribute("data-content-blocker-blocked", "true");
+			el.setAttribute(DATA_CONTENT_BLOCKER_BLOCKED, "true");
 			el.setAttribute("aria-hidden", "true");
 			el.setAttribute("aria-disabled", "true");
 		});
 	},
 	recover: (el) => {
 		return Effect.sync(() => {
-			el.removeAttribute("data-content-blocker-blocked");
+			el.removeAttribute(DATA_CONTENT_BLOCKER_BLOCKED);
 			el.removeAttribute("aria-hidden");
 			el.removeAttribute("aria-disabled");
 		});

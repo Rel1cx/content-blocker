@@ -1,5 +1,4 @@
-import * as Option from "@effect/data/Option";
-import * as Effect from "@effect/io/Effect";
+import { Effect, Option } from "effect";
 import c from "tinyrainbow";
 
 import type { Preset } from "../types";
@@ -11,8 +10,6 @@ import * as segment from "./segment";
 
 // eslint-disable-next-line filenames-simple/named-export
 export function make({ locales, keywords, snippets, regexps }: Preset) {
-	const checkedEls = new WeakSet<HTMLElement>();
-	const blockedEls = new WeakSet<HTMLElement>();
 	const segmenter = segment.make(locales);
 
 	return Effect.gen(function* gen(_) {
@@ -21,27 +18,26 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 		const disposer = yield* _(Disposal);
 		const elements = yield* _(collector.collect());
 
-		yield* _(
+		return yield* _(
 			elements,
 			Effect.forEach((el) => {
 				// eslint-disable-next-line array-callback-return
 				return Effect.gen(function* gen(_) {
 					if (!(el instanceof HTMLElement)) {
-						return;
+						return Effect.unit;
 					}
 
-					if (checkedEls.has(el) || blockedEls.has(el)) {
-						return;
+					if (yield* _(collector.isBlocked(el))) {
+						return Effect.unit;
 					}
 
 					const contentText = yield* _(extractor.extract(el));
 
 					for (const snippet of snippets) {
 						if (contentText.includes(snippet)) {
-							blockedEls.add(el);
 							yield* _(disposer.dispose(el));
 							yield* _(Effect.log(`Blocked by SNIPPET: ${c.gray(c.strikethrough(snippet))}`));
-							return;
+							return Effect.unit;
 						}
 					}
 
@@ -50,15 +46,14 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 							Effect.try({
 								// eslint-disable-next-line security/detect-non-literal-regexp
 								try: () => new RegExp(regexp, "giu"),
-								catch: () => new InvalidRegExpError(),
+								catch: () => InvalidRegExpError({ message: `Invalid RegExp: ${c.gray(regexp)}` }),
 							}),
 						);
 
 						if (exp.test(contentText)) {
-							blockedEls.add(el);
 							yield* _(disposer.dispose(el));
 							yield* _(Effect.log(`Blocked by REGEXP: ${c.gray(regexp)}`));
-							return;
+							return Effect.unit;
 						}
 					}
 
@@ -68,14 +63,13 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 						const matched = Option.fromNullable(keywords.find((keyword) => segment.includes(keyword)));
 
 						if (Option.isSome(matched)) {
-							blockedEls.add(el);
 							yield* _(disposer.dispose(el));
 							yield* _(Effect.log(`Blocked by KEYWORD: ${c.gray(c.strikethrough(matched.value))}`));
-							return;
+							return Effect.unit;
 						}
 					}
 
-					checkedEls.add(el);
+					return Effect.unit;
 				});
 			}),
 		);
