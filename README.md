@@ -6,3 +6,9 @@ The universal content blocker.
 
 -   [BiliBili](https://www.bilibili.com/)
 -   ...
+
+## Supported browsers
+
+-   Chrome >= 87
+-   Edge >= 87
+-   Firefox Not yet

@@ -1,4 +1,4 @@
-export type MatchType = "keyword" | "snippet" | "regexp";
+export type MatchType = "KEYWORD" | "SNIPPET" | "REGEXP";
 
 export type Preset = {
 	version: string;

@@ -40,7 +40,7 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 						if (contentText.includes(snippet)) {
 							blockedEls.add(el);
 							yield* _(disposer.dispose(el));
-							yield* _(Effect.log(`Blocked by snippet: ${c.gray(c.strikethrough(snippet))}`));
+							yield* _(Effect.log(`Blocked by SNIPPET: ${c.gray(c.strikethrough(snippet))}`));
 							return;
 						}
 					}
@@ -57,7 +57,7 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 						if (exp.test(contentText)) {
 							blockedEls.add(el);
 							yield* _(disposer.dispose(el));
-							yield* _(Effect.log(`Blocked by regexp: ${c.gray(regexp)}`));
+							yield* _(Effect.log(`Blocked by REGEXP: ${c.gray(regexp)}`));
 							return;
 						}
 					}
@@ -70,7 +70,7 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 						if (Option.isSome(matched)) {
 							blockedEls.add(el);
 							yield* _(disposer.dispose(el));
-							yield* _(Effect.log(`Blocked by keyword: ${c.gray(c.strikethrough(matched.value))}`));
+							yield* _(Effect.log(`Blocked by KEYWORD: ${c.gray(c.strikethrough(matched.value))}`));
 							return;
 						}
 					}

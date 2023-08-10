@@ -13,20 +13,20 @@ import { make } from "./core/mod";
 import * as bilibili from "./impl/bilibili.com";
 import * as preset from "./presets/test.json";
 
-const BiliBiliBlockRunnable = F.pipe(
+const BiliBiliBlockerRunnable = F.pipe(
 	make(preset),
 	Effect.provideService(Collect, bilibili.collect),
 	Effect.provideService(Extract, bilibili.extract),
 	Effect.provideService(Disposal, bilibili.disposal),
 );
 
-const debouncedRunKeywordFilter = debounce(100, () => Effect.runSync(BiliBiliBlockRunnable), {
+const debouncedRunBiliBiliBlocker = debounce(100, () => Effect.runSync(BiliBiliBlockerRunnable), {
 	atBegin: true,
 });
 
 function observer(container = document.body) {
 	return Effect.sync(() => {
-		const mutationObserver = new MutationObserver(debouncedRunKeywordFilter);
+		const mutationObserver = new MutationObserver(debouncedRunBiliBiliBlocker);
 
 		mutationObserver.observe(container, {
 			childList: true,
@@ -40,7 +40,7 @@ function observer(container = document.body) {
 const program = F.pipe(
 	Effect.promise(() => elementReady("body")),
 	Effect.flatMap(observer),
-	Effect.flatMap(() => Effect.sync(() => window.addEventListener("focus", debouncedRunKeywordFilter))),
+	Effect.flatMap(() => Effect.sync(() => window.addEventListener("focus", debouncedRunBiliBiliBlocker))),
 	Effect.flatMap(() => Effect.log("Content Filter is running...")),
 );
 
