@@ -13,10 +13,8 @@ import { make } from "./core/mod";
 import * as bilibili from "./impl/bilibili.com";
 import * as preset from "./presets/test.json";
 
-const blocker = make(preset);
-
 const BiliBiliBlockRunnable = F.pipe(
-	blocker,
+	make(preset),
 	Effect.provideService(Collect, bilibili.collect),
 	Effect.provideService(Extract, bilibili.extract),
 	Effect.provideService(Disposal, bilibili.disposal),
