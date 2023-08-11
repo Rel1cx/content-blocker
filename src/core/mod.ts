@@ -1,12 +1,15 @@
-import { Effect, Option } from "effect";
-import c from "tinyrainbow";
+import { Duration, Effect, Option } from "effect";
+import { createColors } from "tinyrainbow";
 
+import { makeChunksFromArray } from "../lib/chunk";
 import type { Preset } from "../types";
 import { Collect } from "./collect";
 import { Disposal } from "./disposal";
 import { InvalidRegExpError } from "./errors";
 import { Extract } from "./extract";
 import * as segment from "./segment";
+
+const c = createColors(false);
 
 // eslint-disable-next-line filenames-simple/named-export
 export function make({ locales, keywords, snippets, regexps }: Preset) {
@@ -18,62 +21,65 @@ export function make({ locales, keywords, snippets, regexps }: Preset) {
 		const disposer = yield* _(Disposal);
 		const elements = yield* _(collector.collect());
 
-		return yield* _(
-			elements,
-			Effect.forEach((el) => {
-				// eslint-disable-next-line array-callback-return
-				return Effect.gen(function* gen(_) {
-					if (!(el instanceof HTMLElement)) {
-						return Effect.unit;
-					}
+		const chunks = makeChunksFromArray(Array.from(elements), 2000);
 
-					if (yield* _(collector.isBlocked(el))) {
-						return Effect.unit;
-					}
-
-					const contentText = yield* _(extractor.extract(el));
-
-					for (const snippet of snippets) {
-						if (contentText.includes(snippet)) {
-							yield* _(disposer.dispose(el));
-							yield* _(Effect.log(`Blocked an item by SNIPPET: ${c.gray(c.strikethrough(snippet))}`));
-							return Effect.unit;
+		for (const chunk of chunks) {
+			yield* _(
+				chunk,
+				Effect.forEach((el) => {
+					// eslint-disable-next-line array-callback-return
+					return Effect.gen(function* gen(_) {
+						if (!(el instanceof HTMLElement)) {
+							return;
 						}
-					}
 
-					for (const regexp of regexps) {
-						const exp = yield* _(
-							Effect.try({
-								// eslint-disable-next-line security/detect-non-literal-regexp
-								try: () => new RegExp(regexp, "giu"),
-								catch: () => InvalidRegExpError({ message: `Invalid RegExp: ${c.gray(regexp)}` }),
-							}),
-						);
+						const contentText = yield* _(extractor.extract(el));
 
-						if (exp.test(contentText)) {
-							yield* _(disposer.dispose(el));
-							yield* _(Effect.log(`Blocked an item by REGEXP: ${c.gray(regexp)}`));
-							return Effect.unit;
+						for (const snippet of snippets) {
+							if (contentText.includes(snippet)) {
+								yield* _(disposer.dispose(el));
+								yield* _(Effect.log(`Blocked an item by SNIPPET: ${c.gray(c.strikethrough(snippet))}`));
+								return;
+							}
 						}
-					}
 
-					const segmentIter = yield* _(segmenter.segment(contentText));
-
-					for (const { segment } of segmentIter) {
-						const matched = Option.fromNullable(keywords.find((keyword) => segment.includes(keyword)));
-
-						if (Option.isSome(matched)) {
-							yield* _(disposer.dispose(el));
-							yield* _(
-								Effect.log(`Blocked an item by KEYWORD: ${c.gray(c.strikethrough(matched.value))}`),
+						for (const regexp of regexps) {
+							const exp = yield* _(
+								Effect.try({
+									// eslint-disable-next-line security/detect-non-literal-regexp
+									try: () => new RegExp(regexp, "giu"),
+									catch: () =>
+										InvalidRegExpError({
+											message: `Invalid RegExp: ${c.gray(regexp)}`,
+										}),
+								}),
 							);
-							return Effect.unit;
-						}
-					}
 
-					return Effect.unit;
-				});
-			}),
-		);
+							if (exp.test(contentText)) {
+								yield* _(disposer.dispose(el));
+								yield* _(Effect.log(`Blocked an item by REGEXP: ${c.gray(regexp)}`));
+								return;
+							}
+						}
+
+						const segmentIter = yield* _(segmenter.segment(contentText));
+
+						for (const { segment } of segmentIter) {
+							const matched = Option.fromNullable(keywords.find((keyword) => segment.includes(keyword)));
+
+							if (Option.isSome(matched)) {
+								yield* _(disposer.dispose(el));
+								yield* _(
+									Effect.log(`Blocked an item by KEYWORD: ${c.gray(c.strikethrough(matched.value))}`),
+								);
+								return;
+							}
+						}
+					});
+				}),
+			);
+
+			yield* _(Effect.sleep(Duration.millis(0)));
+		}
 	});
 }

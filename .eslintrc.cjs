@@ -23,6 +23,12 @@ module.exports = {
 	},
 	overrides: [
 		{
+			files: ["*.js"],
+			rules: {
+				"unicorn/no-abusive-eslint-disable": "off",
+			},
+		},
+		{
 			files: ["vite.config.ts", ".eslintrc.cjs"],
 			parserOptions: {
 				project: "./tsconfig.node.json",

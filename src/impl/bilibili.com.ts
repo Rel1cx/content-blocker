@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { DATA_CONTENT_BLOCKER_BLOCKED } from "../constants";
+import { CONTENT_BLOCKER_OVERRIDES, DATA_CONTENT_BLOCKER_BLOCKED } from "../constants";
 import { Collect } from "../core/collect";
 import { Disposal } from "../core/disposal";
 import { Extract } from "../core/extract";
@@ -33,6 +33,28 @@ const selectors = [
 ];
 
 const finalSelectors = `:where(${selectors.join(", ")}):not([${DATA_CONTENT_BLOCKER_BLOCKED}="true"])`;
+
+const styleOverrides = `
+[data-content-blocker-blocked="true"] {
+	display: none !important;
+	opacity: 0 !important;
+	visibility: hidden !important;
+	overflow: hidden !important;
+	pointer-events: none !important;
+}
+`;
+
+export const init = Effect.sync(() => {
+	const styleEl = document.createElement("style");
+	styleEl.id = CONTENT_BLOCKER_OVERRIDES;
+	styleEl.textContent = styleOverrides;
+	document.head.append(styleEl);
+});
+
+export const deinit = Effect.sync(() => {
+	// eslint-disable-next-line unicorn/prefer-query-selector
+	document.getElementById(CONTENT_BLOCKER_OVERRIDES)?.remove();
+});
 
 export const collect = Collect.of({
 	collect: () => Effect.succeed(document.querySelectorAll(finalSelectors)),
