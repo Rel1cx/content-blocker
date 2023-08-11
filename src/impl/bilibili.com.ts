@@ -22,6 +22,10 @@ const selectors = [
 	// Article
 	'[class^="article-item"]',
 
+	// Reply
+	'[class="reply-item"]',
+	'[class="sub-reply-item"]',
+
 	// Misc
 	"[data-aid]",
 	"[data-cid]",
