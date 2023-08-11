@@ -32,8 +32,10 @@ const selectors = [
 	'[href*="bilibili.com/video/BV"]',
 ];
 
+const finalSelectors = `:where(${selectors.join(", ")}):not([${DATA_CONTENT_BLOCKER_BLOCKED}="true"])`;
+
 export const collect = Collect.of({
-	collect: () => Effect.succeed(document.querySelectorAll(selectors.join(", "))),
+	collect: () => Effect.succeed(document.querySelectorAll(finalSelectors)),
 	collectBlocked: () => Effect.succeed(document.querySelectorAll(`[${DATA_CONTENT_BLOCKER_BLOCKED}="true"]`)),
 	isBlocked: (el) => Effect.succeed(el.getAttribute(DATA_CONTENT_BLOCKER_BLOCKED) === "true"),
 });
