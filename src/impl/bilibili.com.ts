@@ -7,14 +7,14 @@ import { Extract } from "../core/extract";
 import { textContentNormalize } from "../lib/text-content-normalize";
 
 const selectors = [
-	// Main site
-	'[class^="floor-card"]',
-	'[class^="carousel-slide"]',
-	'[class^="rank-item"]',
-	// '[class^="feed-card"]',
-	'[class^="video-page-card"]',
+	// Main
+	"[data-aid]",
+	"[data-cid]",
+	'[class^="feed-card"]',
 	'[class*="video-card"]',
+	'[class^="video-page-card"]',
 	'[class*="related-item"]',
+	'[class^="rank-item"]',
 
 	// Live
 	'[class^="room-card"]',
@@ -27,12 +27,12 @@ const selectors = [
 	'[class="sub-reply-item"]',
 
 	// Misc
-	"[data-aid]",
-	"[data-cid]",
+	'[class^="floor-card"]',
+	'[class^="carousel-slide"]',
 	'[href*="bilibili.com/video/BV"]',
 ];
 
-const finalSelectors = `:where(${selectors.join(", ")}):not([${DATA_CONTENT_BLOCKER_BLOCKED}="true"])`;
+const selectorsCombined = `:where(${selectors.join(", ")}):not([${DATA_CONTENT_BLOCKER_BLOCKED}="true"])`;
 
 const styleOverrides = `
 [data-content-blocker-blocked="true"] {
@@ -57,9 +57,8 @@ export const deinit = Effect.sync(() => {
 });
 
 export const collect = Collect.of({
-	collect: () => Effect.succeed(document.querySelectorAll(finalSelectors)),
+	collect: () => Effect.succeed(document.querySelectorAll(selectorsCombined)),
 	collectBlocked: () => Effect.succeed(document.querySelectorAll(`[${DATA_CONTENT_BLOCKER_BLOCKED}="true"]`)),
-	isBlocked: (el) => Effect.succeed(el.getAttribute(DATA_CONTENT_BLOCKER_BLOCKED) === "true"),
 });
 
 export const extract = Extract.of({
