@@ -1,7 +1,7 @@
 /* eslint-disable filenames-simple/naming-convention */
 module.exports = {
 	root: true,
-	extends: ["with-tsconfig", "plugin:filenames-simple/recommended-react"],
+	extends: ["with-tsconfig", "plugin:filenames-simple/recommended"],
 	plugins: ["filenames-simple"],
 	rules: {
 		semi: ["error", "always"],
